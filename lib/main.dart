@@ -12,7 +12,7 @@ import '../../scr/weather/presentation/screens/weather_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
                   theme: ThemeData(
                     scaffoldBackgroundColor: AppColors.scaffoldBackgroundColor,
                     appBarTheme: const AppBarTheme(
-                      color: Colors.transparent,
+                      backgroundColor: Colors.transparent,
                       elevation: 0,
                     ),
                   ),

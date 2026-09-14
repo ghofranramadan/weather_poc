@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:weather_poc/core/util/constants.dart';
+import '../../../../core/util/constants.dart';
 
 import '../../../../core/util/network/network_service.dart';
 import '../../../../core/error/failure.dart';
@@ -35,7 +35,7 @@ class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
       try {
         return Right(WeatherModel.fromJson(response.data));
       } catch (e) {
-        return Left(Failure('Invalid response data'));
+        return const Left(Failure('Invalid response data'));
       }
     });
   }

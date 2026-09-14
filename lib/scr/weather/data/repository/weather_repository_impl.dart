@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:weather_poc/scr/weather/domain/entities/weather_entity.dart';
+import '../../domain/entities/weather_entity.dart';
 
 import '../../../../../../core/util/network/network_info.dart';
 
