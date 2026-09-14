@@ -1,0 +1,12 @@
+{
+  "app_name": "Weather App",
+  "search": "Search",
+  "no_data_found": "No Data Found",
+  "no_connection_or_data_stored": "No connection or data stored.",
+  "fetch_error": "Fetch Error",
+  "load_cache_failed": "Load Cache Failed",
+  "no_internet_connection":"No Internet Connection",
+  "check_internet":"Please check your internet connection and try again",
+  "ok": "OK"
+
+}
