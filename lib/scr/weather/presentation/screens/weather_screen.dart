@@ -26,10 +26,13 @@ class _WeatherScreenState extends State<WeatherScreen> {
   void initState() {
     super.initState();
     viewModel.searchController.text = "egypt";
-    viewModel.getWeatherData(
-      context: context,
-      value: viewModel.searchController.text,
-    );
+    // Localization resolved here in the UI layer — ViewModel never needs context.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      viewModel.getWeatherData(
+        value: viewModel.searchController.text,
+        emptyErrorMessage: AppLocalizations.of(context)!.translate('no_data_found'),
+      );
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -64,19 +67,17 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   ).copyWith(
                     hintText: AppLocalizations.of(context)!.translate('search'),
                   ),
-                  onChangeInput:
-                      (val) {
-
-
-                        const duration = Duration(milliseconds: 700);
-                        viewModel. debouncer.debounce(
-                          duration: duration,
-                          onDebounce: () =>  viewModel.getWeatherData(
-                            context: context,
-                            value: val,
-                          ),
-                        );
-                      }
+                  onChangeInput: (val) {
+                    const duration = Duration(milliseconds: 700);
+                    viewModel.debouncer.debounce(
+                      duration: duration,
+                      onDebounce: () => viewModel.getWeatherData(
+                        value: val,
+                        // Resolved here, in the UI layer where context lives.
+                        emptyErrorMessage: AppLocalizations.of(context)!.translate('no_data_found'),
+                      ),
+                    );
+                  }
 
                 ),
               ),

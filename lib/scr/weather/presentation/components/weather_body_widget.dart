@@ -13,9 +13,30 @@ import '../../../../core/util/localization/app_localizations.dart';
 import '../../domain/entities/weather_entity.dart';
 import '../controller/weather_view_model.dart';
 
+/// SRP: responsible only for rendering the weather data UI.
+/// Date/time formatting is extracted to private helpers so build() only
+/// describes the widget tree.
 class WeatherBodyWidget extends StatelessWidget {
   final WeatherViewModel viewModel;
   const WeatherBodyWidget({super.key, required this.viewModel});
+
+  /// SRP helper: converts an API datetime string to a display date.
+  String _formatDate(String? rawDateTime) {
+    if (rawDateTime == null) return '';
+    try {
+      final datePart = rawDateTime.split(' ').first;
+      return DateFormat('MMM d, yyyy').format(DateTime.parse(datePart));
+    } catch (_) {
+      return '';
+    }
+  }
+
+  /// SRP helper: extracts just the time portion from an API datetime string.
+  String _formatTime(String? rawDateTime) {
+    if (rawDateTime == null) return '';
+    final parts = rawDateTime.split(' ');
+    return parts.length > 1 ? parts[1] : '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,11 +131,7 @@ class WeatherBodyWidget extends StatelessWidget {
               ),
               SizedBox(height: 5.h),
               AppText(
-                text: weatherState.data.current?.lastUpdated !=null?DateFormat('MMM d,yyyy').format(
-                  DateTime.parse(
-                    "${weatherState.data.current?.lastUpdated?.split(' ')[0]}",
-                  ),
-                ):"",
+                text: _formatDate(weatherState.data.current?.lastUpdated),
                 model: AppTextModel(
                   style: AppFontStyleGlobal(
                     AppLocalizations.of(context)!.locale,
@@ -123,8 +140,7 @@ class WeatherBodyWidget extends StatelessWidget {
               ),
               SizedBox(height: 10.h),
               AppText(
-                text:
-                    "${weatherState.data.current?.lastUpdated?.split(' ')[1]}",
+                text: _formatTime(weatherState.data.current?.lastUpdated),
                 model: AppTextModel(
                   style: AppFontStyleGlobal(
                     AppLocalizations.of(context)!.locale,
@@ -134,7 +150,10 @@ class WeatherBodyWidget extends StatelessWidget {
               SizedBox(height: 5.h),
               IconButton(
                 icon: const Icon(Icons.refresh, color: Colors.green),
-                onPressed: () => viewModel.getWeatherData(context: context, value:   viewModel.searchController.text),
+                onPressed: () => viewModel.getWeatherData(
+                  value: viewModel.searchController.text,
+                  emptyErrorMessage: AppLocalizations.of(context)!.translate('no_data_found'),
+                ),
               ),
             ],
           ),

@@ -2,18 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../localization_cache_helper.dart';
+import '../../preferences_service.dart';
 
 part 'localization_state.dart';
 
 class LocalizationCubit extends Cubit<LocalizationState> {
-  LocalizationCubit() : super(LocalizationInitial());
+  final LocalizationCacheHelper _cacheHelper;
+
+  LocalizationCubit()
+    : _cacheHelper = LocalizationCacheHelper(PreferencesServiceImpl()),
+      super(LocalizationInitial());
+
   Future<void> getSavedLanguage() async {
-    final languageCode = await LocalizationCacheHelper.getLanguageCode();
+    final languageCode = await _cacheHelper.getLanguageCode();
     emit(ChangeLanguageState(locale: Locale(languageCode)));
   }
 
   Future<void> changeLanguage(String languageCode) async {
-    LocalizationCacheHelper.setLanguageCode(languageCode);
+    await _cacheHelper.setLanguageCode(languageCode);
     emit(ChangeLanguageState(locale: Locale(languageCode)));
   }
 }
+

@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
 
-import '../../base/depindancy_injection.dart';
 import '../../common/config.dart';
 import '../../common/enums/response_type_enum.dart';
 import '../../error/error_handler.dart';
@@ -60,7 +59,9 @@ abstract class NetworkService {
 }
 
 class NetworkServiceImpl implements NetworkService {
-  final Dio dio = sl<Dio>();
+  final Dio dio;
+
+  NetworkServiceImpl(this.dio);
 
   @override
   Future<Either<Failure, Response>> get(

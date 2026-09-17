@@ -1,42 +1,64 @@
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PreferenceManager {
+/// ISP: callers depend only on this interface.
+/// All mutating methods return Future<void> so errors can be awaited/propagated.
+abstract class PreferencesService {
+  Future<void> saveString(String key, String value);
+  Future<void> saveBoolean(String key, bool value);
+  Future<void> saveInt(String key, int value);
+  Future<void> saveDouble(String key, double value);
+  Future<void> saveMap(String key, Map<String, dynamic> data);
+  Future<void> remove(String key);
+  Future<String?> getString(String key);
+  Future<bool?> getBoolean(String key);
+  Future<int?> getInt(String key);
+  Future<double?> getDouble(String key);
+  Future<Map<String, dynamic>?> getMap(String key);
+  Future<void> clearAll();
+}
+
+class PreferencesServiceImpl implements PreferencesService {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  static PreferenceManager? instance;
 
-  void saveString(String key, String value) async {
+  @override
+  Future<void> saveString(String key, String value) async {
     var prefs = await _prefs;
-    prefs.setString(key, value);
+    await prefs.setString(key, value);
   }
 
-  void saveBoolean(String key, bool value) async {
+  @override
+  Future<void> saveBoolean(String key, bool value) async {
     var prefs = await _prefs;
-    prefs.setBool(key, value);
+    await prefs.setBool(key, value);
   }
 
-  void saveInt(String key, int value) async {
+  @override
+  Future<void> saveInt(String key, int value) async {
     var prefs = await _prefs;
-    prefs.setInt(key, value);
+    await prefs.setInt(key, value);
   }
 
-  void saveDouble(String key, double value) async {
+  @override
+  Future<void> saveDouble(String key, double value) async {
     var prefs = await _prefs;
-    prefs.setDouble(key, value);
+    await prefs.setDouble(key, value);
   }
 
-  void saveMap(String key, Map<String, dynamic> data) async {
+  @override
+  Future<void> saveMap(String key, Map<String, dynamic> data) async {
     var prefs = await _prefs;
     final jsonString = jsonEncode(data);
     await prefs.setString(key, jsonString);
   }
 
-  void remove(String key) async {
+  @override
+  Future<void> remove(String key) async {
     var prefs = await _prefs;
-    prefs.remove(key);
+    await prefs.remove(key);
   }
 
+  @override
   Future<String?> getString(String key) async {
     var prefs = await _prefs;
     if (prefs.containsKey(key)) {
@@ -46,6 +68,7 @@ class PreferenceManager {
     }
   }
 
+  @override
   Future<bool?> getBoolean(String key) async {
     var prefs = await _prefs;
     if (prefs.containsKey(key)) {
@@ -55,6 +78,7 @@ class PreferenceManager {
     }
   }
 
+  @override
   Future<int?> getInt(String key) async {
     var prefs = await _prefs;
     if (prefs.containsKey(key)) {
@@ -64,6 +88,7 @@ class PreferenceManager {
     }
   }
 
+  @override
   Future<double?> getDouble(String key) async {
     var prefs = await _prefs;
     if (prefs.containsKey(key)) {
@@ -73,6 +98,7 @@ class PreferenceManager {
     }
   }
 
+  @override
   Future<Map<String, dynamic>?> getMap(String key) async {
     var prefs = await _prefs;
     final jsonString = prefs.getString(key);
@@ -80,14 +106,9 @@ class PreferenceManager {
     return jsonDecode(jsonString);
   }
 
+  @override
   Future<void> clearAll() async {
     var prefs = await _prefs;
     await prefs.clear();
-  }
-
-  static PreferenceManager? getInstance() {
-    instance ??= PreferenceManager();
-
-    return instance;
   }
 }

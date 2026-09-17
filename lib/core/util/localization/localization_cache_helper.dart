@@ -1,12 +1,17 @@
-import '../shared_preferences_helper.dart';
+import '../preferences_service.dart';
 
+/// DIP: depends on the PreferencesService abstraction, not a concrete singleton.
 class LocalizationCacheHelper {
-  static Future<String> getLanguageCode() async {
-    String? lang = await PreferenceManager.getInstance()!.getString('lang');
-    return lang ?? 'en';
+  final PreferencesService _preferencesService;
+
+  LocalizationCacheHelper(this._preferencesService);
+
+  Future<String> getLanguageCode() async {
+    return await _preferencesService.getString('lang') ?? 'en';
   }
 
-  static Future<void> setLanguageCode(String languageCode) async {
-    PreferenceManager.getInstance()!.saveString('lang', languageCode);
+  Future<void> setLanguageCode(String languageCode) async {
+    await _preferencesService.saveString('lang', languageCode);
   }
 }
+

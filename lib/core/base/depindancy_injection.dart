@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:weather_poc/core/base/route_generator.dart';
+import '../../scr/weather/data/datasource/weather_local_data_source.dart';
 import '../../scr/weather/data/datasource/weather_remote_data_source.dart';
 import '../../scr/weather/data/repository/weather_repository_impl.dart';
 import '../../scr/weather/domain/repository/Weather_repository.dart';
@@ -9,6 +9,7 @@ import '../../scr/weather/domain/usecases/weather_usecase.dart';
 import '../../scr/weather/presentation/controller/weather_view_model.dart';
 import '../common/config.dart';
 import '../util/api_interceptor/api_interceptor.dart';
+import '../util/database_manager.dart';
 import '../util/localization/cubit/localization_cubit.dart';
 import '../util/network/network_info.dart';
 import '../util/network/network_service.dart';
@@ -16,34 +17,56 @@ import '../util/network/network_service.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  sl.registerFactory(() => RouteGenerator(routs: sl()));
+  // ── Localization ──────────────────────────────────────────────────────────
   sl.registerFactory(() => LocalizationCubit());
+
+  // ── Network ───────────────────────────────────────────────────────────────
   sl.registerLazySingleton<NetworkInfo>(
     () => NetworkInfoImpl(sl<InternetConnection>()),
   );
   sl.registerLazySingleton(
     () => InternetConnection.createInstance(),
   );
-  sl.registerLazySingleton<NetworkService>(() => NetworkServiceImpl());
+
+  /// DIP fix: NetworkServiceImpl requires Dio — pass sl<Dio>() not empty ctor.
+  sl.registerLazySingleton<NetworkService>(() => NetworkServiceImpl(sl()));
   sl.registerLazySingleton(
-    () =>
-        Dio(BaseOptions(headers: Config.headers))
-          ..interceptors.add(ApiInterceptor()),
+    () => Dio(BaseOptions(headers: Config.headers))
+      ..interceptors.add(ApiInterceptor()),
   );
 
-  /// VIEW MODELS
-  sl.registerFactory(() => WeatherViewModel(useCase: sl(), networkInfo: sl()));
+  // ── Database ──────────────────────────────────────────────────────────────
+  /// DIP fix: DatabaseManager was never registered — WeatherRepositoryImp
+  /// depends on WeatherLocalDataSource which depends on DatabaseManager.
+  sl.registerLazySingleton<DatabaseManager>(() => DatabaseManagerImpl());
 
-  /// USECASES
+  // ── View Models ───────────────────────────────────────────────────────────
+  /// DIP fix: removed invalid `networkInfo: sl()` — WeatherViewModel has no
+  /// such constructor parameter.
+  sl.registerFactory(() => WeatherViewModel(useCase: sl()));
+
+  // ── Use Cases ─────────────────────────────────────────────────────────────
   sl.registerLazySingleton(() => WeatherUseCase(sl()));
 
-  /// REPOSITORIES
+  // ── Repositories ──────────────────────────────────────────────────────────
+  /// DIP fix: previous registration used `dataSource:` which doesn't match
+  /// the constructor. Corrected to `remoteDataSource:` + `localDataSource:`.
   sl.registerLazySingleton<WeatherRepository>(
-    () => WeatherRepositoryImp(dataSource: sl(), networkInfo: sl()),
+    () => WeatherRepositoryImp(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+      networkInfo: sl(),
+    ),
   );
 
-  /// DATA SOURCE
+  // ── Data Sources ──────────────────────────────────────────────────────────
   sl.registerLazySingleton<WeatherRemoteDataSource>(
     () => WeatherRemoteDataSourceImpl(sl()),
   );
+
+  /// DIP fix: WeatherLocalDataSource was never registered.
+  sl.registerLazySingleton<WeatherLocalDataSource>(
+    () => WeatherLocalDataSourceImpl(sl()),
+  );
 }
+
