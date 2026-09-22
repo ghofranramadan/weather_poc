@@ -28,6 +28,7 @@ class AppTextFieldModel {
   final bool? expands;
   final int? maxLength;
   final void Function()? onEditingComplete;
+  final TextCapitalization? textCapitalization;
   AppTextFieldModel({
     required this.keyboardType,
     this.maxLines,
@@ -53,5 +54,6 @@ class AppTextFieldModel {
     this.maxLength,
     this.expands = false,
     this.onEditingComplete,
+    this.textCapitalization,
   });
 }

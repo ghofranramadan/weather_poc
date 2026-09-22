@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   static const Color scaffoldBackgroundColor = Color(0xFFFFFFFF);
-  // static const Color primaryColor = Color(0xFF4f45e4);
   static const Color primaryColor = Color(0xFF000000);
   static const Color white = Color(0xFFFFFFFF);
   static const Color snackBarBackGroundColor = Color(0xFFF8F7FA);

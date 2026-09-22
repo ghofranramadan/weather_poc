@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/blocs/generic_cubit/generic_cubit.dart';
 import '../../../../core/common/app_colors/app_colors.dart';
@@ -9,49 +8,26 @@ import '../../../../core/common/app_font_style/app_font_style_global.dart';
 import '../../../../core/components/app_text/app_text.dart';
 import '../../../../core/components/app_text/models/app_text_model.dart';
 import '../../../../core/components/custom_network_image.dart';
+import '../../../../core/util/constants.dart';
 import '../../../../core/util/localization/app_localizations.dart';
+import '../../../../core/util/text_helper.dart';
 import '../../domain/entities/weather_entity.dart';
 import '../controller/weather_view_model.dart';
 
-/// SRP: responsible only for rendering the weather data UI.
-/// Date/time formatting is extracted to private helpers so build() only
-/// describes the widget tree.
 class WeatherBodyWidget extends StatelessWidget {
   final WeatherViewModel viewModel;
   const WeatherBodyWidget({super.key, required this.viewModel});
 
-  /// SRP helper: converts an API datetime string to a display date.
-  String _formatDate(String? rawDateTime) {
-    if (rawDateTime == null) return '';
-    try {
-      final datePart = rawDateTime.split(' ').first;
-      return DateFormat('MMM d, yyyy').format(DateTime.parse(datePart));
-    } catch (_) {
-      return '';
-    }
-  }
-
-  /// SRP helper: extracts just the time portion from an API datetime string.
-  String _formatTime(String? rawDateTime) {
-    if (rawDateTime == null) return '';
-    final parts = rawDateTime.split(' ');
-    return parts.length > 1 ? parts[1] : '';
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<
-      GenericCubit<WeatherEntity>,
-      GenericCubitState<WeatherEntity>
-    >(
+    return BlocBuilder<GenericCubit<WeatherEntity>, GenericCubitState<WeatherEntity>>(
       bloc: viewModel.weatherDetails,
       builder: (context, weatherState) {
         if (weatherState is GenericLoadingState) {
           return const Center(
             child: CircularProgressIndicator(color: AppColors.primaryColor),
           );
-        }
-        else if (weatherState is GenericErrorState) {
+        } else if (weatherState is GenericErrorState) {
           return Center(
             child: AppText(
               text: "${weatherState.responseError?.errorMessage}",
@@ -65,7 +41,7 @@ class WeatherBodyWidget extends StatelessWidget {
         }
         return Container(
           width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height*0.71,
+          height: MediaQuery.of(context).size.height * 0.71,
           padding: EdgeInsets.only(
             top: 50,
             bottom: 20,
@@ -81,6 +57,13 @@ class WeatherBodyWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              CustomNetworkImage(
+                url: 'https:${weatherState.data.current?.condition?.icon}',
+                fit: BoxFit.fill,
+                width: 80,
+                height: 80,
+              ),
+              Constants.verticalSpace,
               AppText(
                 text: "${weatherState.data.location?.name}",
                 model: AppTextModel(
@@ -89,7 +72,7 @@ class WeatherBodyWidget extends StatelessWidget {
                   ).bodyRegular1.copyWith(color: AppColors.black),
                 ),
               ),
-              SizedBox(height: 10.h),
+              Constants.verticalSpace,
               AppText(
                 text: "${weatherState.data.current?.condition?.text}",
                 model: AppTextModel(
@@ -98,7 +81,7 @@ class WeatherBodyWidget extends StatelessWidget {
                   ).subTitle1.copyWith(color: AppColors.black),
                 ),
               ),
-              SizedBox(height: 10.h),
+              Constants.verticalSpace,
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
@@ -111,7 +94,7 @@ class WeatherBodyWidget extends StatelessWidget {
                       ).bodyRegular1.copyWith(color: AppColors.black),
                     ),
                   ),
-                  SizedBox(width: 10.h),
+                  Constants.horizontalSpace,
                   AppText(
                     text: "${weatherState.data.current?.tempF} °F",
                     model: AppTextModel(
@@ -122,38 +105,32 @@ class WeatherBodyWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 5.h),
-              CustomNetworkImage(
-                url: 'https:${weatherState.data.current?.condition?.icon}',
-                fit: BoxFit.fill,
-                width: 50,
-                height: 50,
-              ),
-              SizedBox(height: 5.h),
+              Constants.verticalSpace,
               AppText(
-                text: _formatDate(weatherState.data.current?.lastUpdated),
+                text: TextHelper.formatDate(weatherState.data.current?.lastUpdated),
                 model: AppTextModel(
                   style: AppFontStyleGlobal(
                     AppLocalizations.of(context)!.locale,
                   ).bodyRegular1.copyWith(color: AppColors.black),
                 ),
               ),
-              SizedBox(height: 10.h),
+              Constants.verticalSpace,
               AppText(
-                text: _formatTime(weatherState.data.current?.lastUpdated),
+                text: TextHelper.formatTime(weatherState.data.current?.lastUpdated),
                 model: AppTextModel(
                   style: AppFontStyleGlobal(
                     AppLocalizations.of(context)!.locale,
                   ).bodyRegular1.copyWith(color: AppColors.black),
                 ),
               ),
-              SizedBox(height: 5.h),
+              Constants.verticalSpace,
               IconButton(
                 icon: const Icon(Icons.refresh, color: Colors.green),
-                onPressed: () => viewModel.getWeatherData(
-                  value: viewModel.searchController.text,
-                  emptyErrorMessage: AppLocalizations.of(context)!.translate('no_data_found'),
-                ),
+                onPressed:
+                    () => viewModel.getWeatherData(
+                      value: viewModel.searchController.text,
+                      emptyErrorMessage: AppLocalizations.of(context)!.translate('no_data_found'),
+                    ),
               ),
             ],
           ),

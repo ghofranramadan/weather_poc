@@ -9,9 +9,6 @@ import '../datasource/weather_remote_data_source.dart';
 import '../datasource/weather_local_data_source.dart';
 import '../models/weather_db_model.dart';
 
-/// SRP: each method has one clear responsibility.
-/// DIP: depends on abstractions (WeatherRepository, WeatherRemoteDataSource,
-///      WeatherLocalDataSource, NetworkInfo) — never on concrete classes.
 class WeatherRepositoryImp implements WeatherRepository {
   final WeatherRemoteDataSource remoteDataSource;
   final WeatherLocalDataSource localDataSource;
@@ -33,12 +30,11 @@ class WeatherRepositoryImp implements WeatherRepository {
 
     final response = await remoteDataSource.getWeather(location: location);
     return response.map((data) {
-      _cacheWeather(data); // intentional fire-and-forget background cache
+      _cacheWeather(data);
       return data;
     });
   }
 
-  /// Loads the last-known weather from the local database.
   Future<Either<Failure, WeatherEntity>> _loadFromCache() async {
     final cached = await localDataSource.getStoredWeather();
     if (cached != null) {
@@ -60,9 +56,6 @@ class WeatherRepositoryImp implements WeatherRepository {
     return const Left(Failure('No connection or data stored'));
   }
 
-  /// SRP: responsible only for writing fresh data to the local cache.
-  /// Errors are caught and silenced intentionally — cache failures should not
-  /// surface to the user when fresh data is already returned.
   Future<void> _cacheWeather(WeatherEntity data) async {
     try {
       await localDataSource.deleteWeather();
@@ -77,7 +70,6 @@ class WeatherRepositoryImp implements WeatherRepository {
         ),
       );
     } catch (_) {
-      // Cache write failure is non-critical; fresh data was already returned.
     }
   }
 }

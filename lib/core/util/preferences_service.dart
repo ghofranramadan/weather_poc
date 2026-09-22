@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// ISP: callers depend only on this interface.
-/// All mutating methods return Future<void> so errors can be awaited/propagated.
 abstract class PreferencesService {
   Future<void> saveString(String key, String value);
   Future<void> saveBoolean(String key, bool value);

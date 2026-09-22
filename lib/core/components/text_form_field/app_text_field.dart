@@ -57,6 +57,7 @@ class _AppTextFieldState extends State<AppTextField> {
           },
           cursorHeight: 24,
           cursorWidth: 2.5,
+          textCapitalization: widget.model.textCapitalization ?? TextCapitalization.none,
           cursorColor: AppColors.primaryColor,
           controller: widget.model.controller,
           initialValue: widget.model.initialValue,
@@ -75,9 +76,7 @@ class _AppTextFieldState extends State<AppTextField> {
           decoration: widget.model.decoration.copyWith(
             counter: const SizedBox(),
             contentPadding:
-                widget.model.minLines! > 1
-                    ? const EdgeInsets.symmetric(vertical: 15, horizontal: 18)
-                    : null,
+                widget.model.minLines! > 1 ? const EdgeInsets.symmetric(vertical: 15, horizontal: 18) : null,
             suffixIcon: widget.model.suffixIcon,
             prefixIcon: widget.model.prefixIcon,
             labelStyle: AppFontStyleGlobal(
@@ -85,8 +84,7 @@ class _AppTextFieldState extends State<AppTextField> {
             ).smallTab.copyWith(
               fontSize: 12.sp,
               color:
-                  _focusNode.hasFocus ||
-                          widget.model.controller!.text.isNotEmpty
+                  _focusNode.hasFocus || widget.model.controller!.text.isNotEmpty
                       ? AppColors.primaryColor
                       : AppColors.hint,
               height: 0,
@@ -101,11 +99,7 @@ class _AppTextFieldState extends State<AppTextField> {
               ).bodyRegular1.copyWith(
                 overflow: TextOverflow.ellipsis,
                 color: AppColors.primaryColor,
-                height:
-                    widget.model.minLines! > 1 &&
-                            widget.model.controller!.text.isNotEmpty
-                        ? null
-                        : 1,
+                height: widget.model.minLines! > 1 && widget.model.controller!.text.isNotEmpty ? null : 1,
               ),
         ),
       ],

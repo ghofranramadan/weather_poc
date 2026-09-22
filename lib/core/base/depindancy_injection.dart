@@ -27,8 +27,6 @@ Future<void> init() async {
   sl.registerLazySingleton(
     () => InternetConnection.createInstance(),
   );
-
-  /// DIP fix: NetworkServiceImpl requires Dio — pass sl<Dio>() not empty ctor.
   sl.registerLazySingleton<NetworkService>(() => NetworkServiceImpl(sl()));
   sl.registerLazySingleton(
     () => Dio(BaseOptions(headers: Config.headers))
@@ -36,21 +34,15 @@ Future<void> init() async {
   );
 
   // ── Database ──────────────────────────────────────────────────────────────
-  /// DIP fix: DatabaseManager was never registered — WeatherRepositoryImp
-  /// depends on WeatherLocalDataSource which depends on DatabaseManager.
   sl.registerLazySingleton<DatabaseManager>(() => DatabaseManagerImpl());
 
   // ── View Models ───────────────────────────────────────────────────────────
-  /// DIP fix: removed invalid `networkInfo: sl()` — WeatherViewModel has no
-  /// such constructor parameter.
   sl.registerFactory(() => WeatherViewModel(useCase: sl()));
 
   // ── Use Cases ─────────────────────────────────────────────────────────────
   sl.registerLazySingleton(() => WeatherUseCase(sl()));
 
   // ── Repositories ──────────────────────────────────────────────────────────
-  /// DIP fix: previous registration used `dataSource:` which doesn't match
-  /// the constructor. Corrected to `remoteDataSource:` + `localDataSource:`.
   sl.registerLazySingleton<WeatherRepository>(
     () => WeatherRepositoryImp(
       remoteDataSource: sl(),
@@ -63,8 +55,6 @@ Future<void> init() async {
   sl.registerLazySingleton<WeatherRemoteDataSource>(
     () => WeatherRemoteDataSourceImpl(sl()),
   );
-
-  /// DIP fix: WeatherLocalDataSource was never registered.
   sl.registerLazySingleton<WeatherLocalDataSource>(
     () => WeatherLocalDataSourceImpl(sl()),
   );

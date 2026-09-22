@@ -67,7 +67,7 @@ class CustomAppBar extends StatelessWidget {
           if (model.showMenuButton == true)
             InkWell(
               onTap: model.menuOnTap ?? () {},
-              child: Icon(
+              child: const Icon(
                  Icons.menu,
                 size: 32,
               ),

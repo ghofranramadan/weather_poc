@@ -98,7 +98,7 @@ class AppFontStyleAr extends AppFontStyle {
   @override
   TextStyle get bodyRegular1 => TextStyle(
         fontFamily: fontFamily,
-        fontSize: 16.sp,
+        fontSize: 20.sp,
         fontWeight: FontWeight.w400,
         letterSpacing: 0,
         height: height,

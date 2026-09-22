@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../scr/weather/presentation/screens/weather_screen.dart';
 
-/// Pure static routing utility.
-/// SRP: only responsible for mapping route names → pages.
-/// OCP: extend by adding new cases; existing cases are never modified.
 class RouteGenerator {
-  RouteGenerator._(); // prevent instantiation
+  RouteGenerator._();
 
   static Route<dynamic> generatedRoute(RouteSettings settings) {
     switch (settings.name) {
       case WeatherScreen.routeName:
         return MaterialPageRoute(
           builder: (_) => const WeatherScreen(),
-          settings: RouteSettings(name: WeatherScreen.routeName),
+          settings: const RouteSettings(name: WeatherScreen.routeName),
         );
       default:
         return _errorRoute();

@@ -6,9 +6,6 @@ import '../../../../core/error/failure.dart';
 import '../../domain/entities/weather_entity.dart';
 import '../../domain/usecases/weather_usecase.dart';
 
-/// SRP: only responsible for weather-related UI state and calling the use-case.
-/// DIP: depends on WeatherUseCase abstraction; no direct coupling to Flutter UI
-///      framework concepts (BuildContext / AppLocalizations removed).
 class WeatherViewModel {
   final WeatherUseCase useCase;
 
@@ -32,8 +29,7 @@ class WeatherViewModel {
     );
   }
 
-  /// [emptyErrorMessage] is resolved by the UI layer (e.g. from AppLocalizations)
-  /// so the ViewModel never needs a BuildContext.
+
   Future<void> getWeatherData({
     required String value,
     required String emptyErrorMessage,

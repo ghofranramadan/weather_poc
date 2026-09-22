@@ -1,6 +1,5 @@
 import '../preferences_service.dart';
 
-/// DIP: depends on the PreferencesService abstraction, not a concrete singleton.
 class LocalizationCacheHelper {
   final PreferencesService _preferencesService;
 
